@@ -91,7 +91,7 @@ class LinguisticTerm
 end
 class Function
 
-	attr_reader :min,:max
+	attr_reader :min,:max,:proc
 	# @param [Proc] proc
 	# @param [Number] min
 	def initialize(proc,min,max)
@@ -101,6 +101,12 @@ class Function
 	end
 	def call(x)
 		@proc.call x
+	end
+	def plot(title)
+		x = (@min..@max).step((@max-@min)/100.0).to_a
+		y = x.map{|v|@proc.call(v)}
+
+		Plot.plot x,y,title
 	end
 	def self.Triangle(a,b,c,x)
 		o1 = x - a

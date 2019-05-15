@@ -1,5 +1,5 @@
 class Plot
-	def self.plot(x, y, title, lines:'lines', width:4, minX:y.min, maxX:y.max)
+	def self.plot(x, y, title, lines:'lines', width:4, minX:x.min, maxX:x.max)
 		Gnuplot.open do |gp|
 			Gnuplot::Plot.new( gp ) do |plot|
 

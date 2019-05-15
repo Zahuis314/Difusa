@@ -2,7 +2,7 @@ class Logic
   attr_reader :variables,:operator
   # @param [Array(LinguisticVariable)] variables
   # @param [Operator] operator
-  def initialize(operator=ZadehOperator)
+  def initialize(operator=ZadehOperator,aggregation=MamdaniTruncate,defuzzification=Centroide)
     @cantidadPoca       = LinguisticTerm.new('Poca',      Function.GenerateFunction('L', 0,1500,4500))
     @cantidadNormal     = LinguisticTerm.new('Normal',    Function.GenerateFunction('Triangle', 1000,3500,6500))
     @cantidadMucha      = LinguisticTerm.new('Mucha',     Function.GenerateFunction('Triangle', 3500,5500,8000))
@@ -27,7 +27,7 @@ class Logic
     @variables = [@cantidad,@suciedad,@calidad]
     @operator = operator
     @aggregation = aggregation
-
+    @defuzzification = defuzzification
     @variables.each { |variable| variable.logic = self }
   end
 
@@ -44,6 +44,7 @@ class Logic
     @variables.each do |variable|
       variable.plot
     end
+    @detergente.plot
   end
   def get_values
     Hash[
@@ -87,9 +88,24 @@ class Logic
     poca.map! {|val| val.value}
     media.map! {|val| val.value}
     mucha.map! {|val| val.value}
-    {Poca: poca, Media: media, Mucha: mucha}
+    implicationFunctions = @aggregation.implication( @detergente,Poca: poca, Media: media, Mucha: mucha)
+    implicationFunctions.plot
+    aggregationFunction = @aggregation.aggregation(implicationFunctions)
+    aggregationFunction.plot 'Aggregation'
+    aggregationFunction
   end
 
-  def defuzzification
+  def defuzzification(func)
+    @defuzzification.defuzzification(func)
+  end
+
+  def simulate(dict)
+
+    self.plot
+    self.fuzzification(dict)
+    a = self.get_values
+    func = self.rules
+    value = self.defuzzification func
+    p value
   end
 end
