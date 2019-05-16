@@ -3,14 +3,14 @@ class Aggregation
 	def self.aggregation(*funcs);end
 end
 
-class MamdaniTruncate < Aggregation
+class MamdaniMin < Aggregation
 	def self.implication(obj,**argv)
 		argv.transform_values! {|v| v.max }
 		# p argv
 		result = []
 		minProc = Proc.new {|x,y| [x,y].min}
 		obj.terms.each_pair do |k,v|
-			p v.func
+			# p v.func
 			f = v.func.proc
 			g = minProc.curry.call argv[v.name.to_sym]
 			result << LinguisticTerm.new(v.name+"Truncated",Function.new(Proc.new{|x| g.call(f.call(x))}, v.func.min, v.func.max))
@@ -30,17 +30,23 @@ class MamdaniTruncate < Aggregation
 	end
 end
 
-class MamdaniReduce < Aggregation
+class LarsenMamdaniProduct < Aggregation
 	def self.implication(obj,**argv)
 		argv.transform_values! {|v| v.max }
 		# p argv
 		result = []
 		obj.terms.each_pair do |k,v|
-			p v.func
+			# p v.func
 			f = v.func.proc
-			result << LinguisticTerm.new(v.name+"Truncated",Function.new(Proc.new{|x| f.call(x)*argv[v.name.to_sym]}, v.func.min, v.func.max))
+			result << LinguisticTerm.new(
+			  v.name+"Product",
+			  Function.new(
+						Proc.new{
+						  |x| f.call(x)*argv[v.name.to_sym]},
+						v.func.min,
+						v.func.max))
 		end
-		LinguisticVariable.new(obj.name+"Truncated",*result)
+		LinguisticVariable.new(obj.name+"Product",*result)
 	end
 
 	# @param [LinguisticVariable] var
@@ -55,8 +61,4 @@ class MamdaniReduce < Aggregation
 	end
 end
 
-# f<<g
-# f(g(x))
-#
-# f>>g
-# g(f(x))
+# a+b-a*b

@@ -1,28 +1,29 @@
 class Logic
   attr_reader :variables,:operator
-  # @param [Array(LinguisticVariable)] variables
   # @param [Operator] operator
-  def initialize(operator=ZadehOperator,aggregation=MamdaniTruncate,defuzzification=Centroide)
+  # @param [Aggregation] aggregation
+  # # @param [Defuzzification] defuzzification
+  def initialize(operator=ZadehOperator,aggregation=MamdaniMin,defuzzification=Centroide)
     @cantidadPoca       = LinguisticTerm.new('Poca',      Function.GenerateFunction('L', 0,1500,4500))
     @cantidadNormal     = LinguisticTerm.new('Normal',    Function.GenerateFunction('Triangle', 1000,3500,6500))
     @cantidadMucha      = LinguisticTerm.new('Mucha',     Function.GenerateFunction('Triangle', 3500,5500,8000))
     @cantidadDemasiada  = LinguisticTerm.new('Demasiada', Function.GenerateFunction('Gamma', 4500,7000,9000))
-    @cantidad = LinguisticVariable.new('Cantidad',@cantidadPoca,@cantidadNormal,@cantidadMucha,@cantidadDemasiada)
+    @cantidad = LinguisticVariable.new('CantidadDeRopa',@cantidadPoca,@cantidadNormal,@cantidadMucha,@cantidadDemasiada)
 
     @suciedadSucia    = LinguisticTerm.new('Sucia',   Function.GenerateFunction('L', 0,2,3.5))
     @suciedadRegular  = LinguisticTerm.new('Regular', Function.GenerateFunction('Trapezoidal', 2.5,4,6,7.5))
     @suciedadLimpia   = LinguisticTerm.new('Limpia',  Function.GenerateFunction('Gamma', 6.5,8,10))
-    @suciedad = LinguisticVariable.new('Suciedad',@suciedadSucia,@suciedadRegular,@suciedadLimpia)
+    @suciedad = LinguisticVariable.new('SuciedadDeRopa',@suciedadSucia,@suciedadRegular,@suciedadLimpia)
 
     @calidadMala    = LinguisticTerm.new('Mala',    Function.GenerateFunction('L', 0,0,4))
     @calidadRegular = LinguisticTerm.new('Regular', Function.GenerateFunction('Trapezoidal', 0,3,7,10))
     @calidadBuena   = LinguisticTerm.new('Buena',   Function.GenerateFunction('Gamma', 6,10,10))
-    @calidad = LinguisticVariable.new('Calidad',@calidadMala,@calidadRegular,@calidadBuena)
+    @calidad = LinguisticVariable.new('CalidadDeDetergente',@calidadMala,@calidadRegular,@calidadBuena)
 
     @detergentePoca  = LinguisticTerm.new('Poca',  Function.GenerateFunction('L', 0,40,80))
     @detergenteMedia = LinguisticTerm.new('Media', Function.GenerateFunction('Trapezoidal', 40,80,120,160))
     @detergenteMucha = LinguisticTerm.new('Mucha', Function.GenerateFunction('Gamma', 120,160,200))
-    @detergente = LinguisticVariable.new('Cantidad',@detergentePoca,@detergenteMedia,@detergenteMucha)
+    @detergente = LinguisticVariable.new('CantidadDeDetergente',@detergentePoca,@detergenteMedia,@detergenteMucha)
 
     @variables = [@cantidad,@suciedad,@calidad]
     @operator = operator
@@ -91,7 +92,7 @@ class Logic
     implicationFunctions = @aggregation.implication( @detergente,Poca: poca, Media: media, Mucha: mucha)
     implicationFunctions.plot
     aggregationFunction = @aggregation.aggregation(implicationFunctions)
-    aggregationFunction.plot 'Aggregation'
+    aggregationFunction.plot "Aggregation - #{@operator}-#{@aggregation}-#{@defuzzification} "
     aggregationFunction
   end
 
@@ -100,12 +101,11 @@ class Logic
   end
 
   def simulate(dict)
-
-    self.plot
     self.fuzzification(dict)
+    self.plot
     a = self.get_values
     func = self.rules
+
     value = self.defuzzification func
-    p value
   end
 end

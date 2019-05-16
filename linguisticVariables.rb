@@ -82,6 +82,10 @@ class LinguisticTerm
 		result.value = @parent.logic.operator.or(@value,another.value)
 		result
 	end
+	def !()
+		p 'caca'
+		true
+	end
 	def not
 		@parent.logic.operator.not @value
 	end
