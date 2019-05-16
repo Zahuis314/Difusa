@@ -57,13 +57,13 @@ class Logic
   def rules
     poca,media,mucha = [],[],[]
 
-    regla0 = @suciedadLimpia
-    poca << regla0
+    regla1 = @suciedadLimpia
+    poca << regla1
 
-    regla1 = @cantidadPoca & @suciedadSucia & (@calidadMala | @calidadRegular)
-    media << regla1
-    regla2 = @cantidadPoca & @suciedadRegular & (@calidadMala | @calidadRegular)
-    poca << regla2
+    regla2 = @cantidadPoca & @suciedadSucia & (@calidadMala | @calidadRegular)
+    media << regla2
+    regla3 = @cantidadPoca & @suciedadRegular & (@calidadMala | @calidadRegular)
+    poca << regla3
     regla4 = @cantidadPoca  & @calidadBuena
     poca << regla4
 
@@ -90,9 +90,9 @@ class Logic
     media.map! {|val| val.value}
     mucha.map! {|val| val.value}
     implicationFunctions = @aggregation.implication( @detergente,Poca: poca, Media: media, Mucha: mucha)
-    implicationFunctions.plot
+    # implicationFunctions.plot
     aggregationFunction = @aggregation.aggregation(implicationFunctions)
-    aggregationFunction.plot "Aggregation - #{@operator}-#{@aggregation}-#{@defuzzification} "
+    # aggregationFunction.plot "Aggregation - #{@operator}-#{@aggregation}-#{@defuzzification} "
     aggregationFunction
   end
 
@@ -106,6 +106,6 @@ class Logic
     a = self.get_values
     func = self.rules
 
-    value = self.defuzzification func
+    self.defuzzification func
   end
 end
